@@ -1,6 +1,6 @@
 import {ActionFunctionArgs, LoaderFunctionArgs, redirect} from "@remix-run/node";
 import {prisma} from "~/prisma.service";
-import {Form, json, useLoaderData, useNavigation} from "@remix-run/react";
+import {Form, json, useFetcher, useLoaderData, useNavigation} from "@remix-run/react";
 import {Button, Input, Textarea} from "@nextui-org/react";
 
 export const loader = async (c: LoaderFunctionArgs) => {
@@ -53,8 +53,10 @@ export default function Page() {
 
   const navigation = useNavigation()
 
-  const isDeleting = navigation.state ==='submitting' && navigation.formData?.get('action') === 'delete'
   const isEditing = navigation.state ==='submitting' && navigation.formData?.get('action') === 'edit'
+
+  const deleteFetcher = useFetcher()
+  const isDeleting =deleteFetcher.state ==='submitting'
 
   return (
     <div className={'p-12'}>
@@ -64,9 +66,11 @@ export default function Page() {
           <Input label={'标题'} name={'title'} defaultValue={loaderData.post.title}/>
           <Textarea minRows={10} label={'正文'} name={'content'} defaultValue={loaderData.post.content}/>
           <Button name={'action'} type={'submit'} value={'edit'} color={'primary'} isLoading={isEditing}>更新</Button>
-          <Button name={'action'} type={'submit'} value={'delete'} color={'danger'} isLoading={isDeleting}>删除文章</Button>
         </div>
       </Form>
+      <deleteFetcher.Form method={'POST'} action={`/posts/${loaderData.post.id}/delete`}>
+        <Button name={'action'} type={'submit'} value={'delete'} color={'danger'} isLoading={isDeleting}>删除文章</Button>
+      </deleteFetcher.Form>
     </div>
   )
 }
