@@ -1,4 +1,4 @@
-import {LoaderFunctionArgs} from "@remix-run/node";
+import {ActionFunctionArgs, LoaderFunctionArgs, redirect} from "@remix-run/node";
 import {prisma} from "~/prisma.service";
 import {Form, json, useLoaderData, useNavigation} from "@remix-run/react";
 import {Button, Input, Textarea} from "@nextui-org/react";
@@ -20,6 +20,34 @@ export const loader = async (c: LoaderFunctionArgs) => {
   })
 }
 
+export const action = async (c: ActionFunctionArgs) => {
+  const postId = c.params.postId as string;
+  const formData = await c.request.formData()
+
+  const title = formData.get('title') as string
+  const content = formData.get('content') as string
+  const slug = formData.get("slug") as string
+  const action = formData.get("action") as string
+
+  if (action ==='delete'){
+    // exec delete
+    // return redirect("/posts")
+  }
+
+  await prisma.post.update({
+    where: {
+      id: postId
+    },
+    data: {
+      id: slug,
+      content,
+      title
+    }
+  })
+
+  return redirect(`/posts/${slug}`)
+}
+
 export default function Page() {
   const loaderData = useLoaderData<typeof loader>()
 
@@ -32,7 +60,8 @@ export default function Page() {
           <Input label={'slug'} name={'slug'} defaultValue={loaderData.post.id}/>
           <Input label={'标题'} name={'title'} defaultValue={loaderData.post.title}/>
           <Textarea minRows={10} label={'正文'} name={'content'} defaultValue={loaderData.post.content}/>
-          <Button type={'submit'} color={'primary'} isLoading={navigation.state === 'submitting'}>更新</Button>
+          <Button name={'action'} type={'submit'} value={'edit'} color={'primary'} isLoading={navigation.state === 'submitting'}>更新</Button>
+          <Button name={'action'} type={'submit'} value={'delete'} color={'danger'} isLoading={navigation.state === 'submitting'}>删除文章</Button>
         </div>
       </Form>
     </div>

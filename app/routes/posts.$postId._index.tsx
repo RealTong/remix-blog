@@ -1,4 +1,4 @@
-import {ActionFunctionArgs, LoaderFunctionArgs, redirect} from "@remix-run/node";
+import {LoaderFunctionArgs} from "@remix-run/node";
 import {prisma} from "~/prisma.service";
 import {json, Link, useLoaderData} from "@remix-run/react";
 import ReactMarkdown from 'react-markdown'
@@ -19,28 +19,6 @@ export const loader = async (c: LoaderFunctionArgs) => {
   return json({
     post
   })
-}
-
-export const action = async (c: ActionFunctionArgs) => {
-  const postId = c.params.postId as string;
-  const formData = await c.request.formData()
-
-  const title = formData.get('title') as string
-  const content = formData.get('content') as string
-  const slug = formData.get("slug") as string
-
-  await prisma.post.update({
-    where: {
-      id: postId
-    },
-    data: {
-      id: slug,
-      content,
-      title
-    }
-  })
-
-  return redirect(`/posts/${slug}`)
 }
 
 export default function Page() {
