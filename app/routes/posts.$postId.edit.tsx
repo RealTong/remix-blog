@@ -29,7 +29,7 @@ export const action = async (c: ActionFunctionArgs) => {
   const slug = formData.get("slug") as string
   const action = formData.get("action") as string
 
-  if (action ==='delete'){
+  if (action === 'delete') {
     // exec delete
     // return redirect("/")
   }
@@ -53,10 +53,10 @@ export default function Page() {
 
   const navigation = useNavigation()
 
-  const isEditing = navigation.state ==='submitting' && navigation.formData?.get('action') === 'edit'
+  const isEditing = navigation.state === 'submitting' && navigation.formData?.get('action') === 'edit'
 
   const deleteFetcher = useFetcher()
-  const isDeleting =deleteFetcher.state ==='submitting'
+  const isDeleting = deleteFetcher.state === 'submitting'
 
   return (
     <div className={'p-12'}>
@@ -69,7 +69,15 @@ export default function Page() {
         </div>
       </Form>
       <deleteFetcher.Form method={'POST'} action={`/posts/${loaderData.post.id}/delete`}>
-        <Button name={'action'} type={'submit'} value={'delete'} color={'danger'} isLoading={isDeleting}>删除文章</Button>
+        <Button name={'action'} value={'delete'} color={'danger'} isLoading={isDeleting}
+                onClick={() => {
+                  if (confirm("确定删除吗？")) {
+                    deleteFetcher.submit(null, {
+                      method: "POST",
+                      action: `/posts/${loaderData.post.id}/delete`
+                    })
+                  }
+                }}>删除文章</Button>
       </deleteFetcher.Form>
     </div>
   )
