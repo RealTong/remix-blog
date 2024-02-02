@@ -31,7 +31,7 @@ export const action = async (c: ActionFunctionArgs) => {
 
   if (action ==='delete'){
     // exec delete
-    // return redirect("/posts")
+    // return redirect("/")
   }
 
   await prisma.post.update({
@@ -53,6 +53,9 @@ export default function Page() {
 
   const navigation = useNavigation()
 
+  const isDeleting = navigation.state ==='submitting' && navigation.formData?.get('action') === 'delete'
+  const isEditing = navigation.state ==='submitting' && navigation.formData?.get('action') === 'edit'
+
   return (
     <div className={'p-12'}>
       <Form method={"POST"}>
@@ -60,8 +63,8 @@ export default function Page() {
           <Input label={'slug'} name={'slug'} defaultValue={loaderData.post.id}/>
           <Input label={'标题'} name={'title'} defaultValue={loaderData.post.title}/>
           <Textarea minRows={10} label={'正文'} name={'content'} defaultValue={loaderData.post.content}/>
-          <Button name={'action'} type={'submit'} value={'edit'} color={'primary'} isLoading={navigation.state === 'submitting'}>更新</Button>
-          <Button name={'action'} type={'submit'} value={'delete'} color={'danger'} isLoading={navigation.state === 'submitting'}>删除文章</Button>
+          <Button name={'action'} type={'submit'} value={'edit'} color={'primary'} isLoading={isEditing}>更新</Button>
+          <Button name={'action'} type={'submit'} value={'delete'} color={'danger'} isLoading={isDeleting}>删除文章</Button>
         </div>
       </Form>
     </div>
